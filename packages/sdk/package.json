@@ -3,7 +3,8 @@
   "version": "0.0.0-private",
   "private": true,
   "files": [
-    "dist"
+    "dist",
+    "src/server.ts"
   ],
   "type": "module",
   "main": "./dist/index.mjs",
@@ -13,9 +14,14 @@
       "types": "./dist/index.d.mts",
       "import": "./dist/index.mjs",
       "default": "./dist/index.mjs"
+    },
+    "./server": {
+      "types": "./src/server.ts",
+      "import": "./dist/server.mjs",
+      "default": "./dist/server.mjs"
     }
   },
   "scripts": {
-    "build": "tsdown src/index.ts --no-config --platform node --format esm --dts --out-dir dist --clean"
+    "build": "tsdown"
   }
 }
