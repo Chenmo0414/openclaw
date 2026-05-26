@@ -25,5 +25,19 @@ export default defineConfig([
     dts: false,
     clean: false,
     outDir: "dist",
+    // 强制 server entry single bundle · 消除 cross-chunk import 在 packaged
+    // Electron 33 + asar 协议下的 ESM cycle bug(server.impl 的 var 在被 consumer
+    // chunk live binding access 时是 undefined,触发 `__commonJSMin / require_lib
+    // is not a function`)。详 docs/CLIENT-UI-ARCHITECTURE / lighthouse-assistant
+    // utilityProcess.fork 验证记录。
+    //
+    // 副作用:server.mjs 体积合并(从分散 ~120 个 chunks 合到 1 个 ~37 MB 文件)
+    outputOptions: {
+      inlineDynamicImports: true,
+    },
+    // tsdown 默认把 SDK 自家 node_modules 的 npm 包当 external · prod 包没那些
+    // 依赖装在 node_modules → 运行时 `Cannot find module 'undici' / 'better-sqlite3' / ...`
+    // alwaysBundle 强制把所有 SDK 依赖(node:* 内置除外)inline 进 server.mjs
+    noExternal: [/^(?!node:).*/],
   },
 ]);
