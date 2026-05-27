@@ -40,4 +40,21 @@ export default defineConfig([
     // alwaysBundle 强制把所有 SDK 依赖(node:* 内置除外)inline 进 server.mjs
     noExternal: [/^(?!node:).*/],
   },
+  // facade-activation-check.runtime · plugin-sdk 在 runtime 用 createRequire(import.meta.url)
+  // 加载 `./facade-activation-check.runtime.js` 兄弟文件,不被 server.mjs single-bundle
+  // 自动包含。必须单独 build 一个 sibling .js 文件到 dist/,createRequire 才能解析。
+  // 用 .js 后缀(非 .mjs)是因为源码 candidate list 写死了 [.js, .ts]。
+  {
+    entry: { "facade-activation-check.runtime": "../../src/plugin-sdk/facade-activation-check.runtime.ts" },
+    format: "cjs",
+    platform: "node",
+    dts: false,
+    clean: false,
+    outDir: "dist",
+    outExtensions: () => ({ js: ".js" }),
+    outputOptions: {
+      inlineDynamicImports: true,
+    },
+    noExternal: [/^(?!node:).*/],
+  },
 ]);
