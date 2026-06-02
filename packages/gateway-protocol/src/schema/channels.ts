@@ -774,6 +774,9 @@ export const WebLoginWaitParamsSchema = Type.Object(
     timeoutMs: Type.Optional(Type.Integer({ minimum: 0 })),
     accountId: Type.Optional(Type.String()),
     currentQrDataUrl: Type.Optional(QrDataUrlSchema),
+    // lighthouse patch:@tencent-weixin/openclaw-weixin loginWithQrWait
+    // 用 sessionKey 寻找 pending login,丢了会立即 connected=false。
+    sessionKey: Type.Optional(Type.String()),
   },
   { additionalProperties: false },
 );
