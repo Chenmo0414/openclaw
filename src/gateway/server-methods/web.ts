@@ -157,7 +157,14 @@ export const webHandlers: GatewayRequestHandlers = {
         accountId,
         currentQrDataUrl:
           typeof params.currentQrDataUrl === "string" ? params.currentQrDataUrl : undefined,
-      });
+        // lighthouse patch (2026-05-16):透传 sessionKey 给 plugin。
+        // @tencent-weixin/openclaw-weixin 的 loginWithQrWait 用 sessionKey 寻找对应的
+        // pending login;丢了它会立即返回 connected=false。run 参数类型未含 sessionKey,故整体 as never。
+        sessionKey:
+          typeof (params as { sessionKey?: unknown }).sessionKey === "string"
+            ? (params as { sessionKey?: string }).sessionKey
+            : undefined,
+      } as never);
       if (result.connected) {
         await context.startChannel(provider.id, accountId);
       }
